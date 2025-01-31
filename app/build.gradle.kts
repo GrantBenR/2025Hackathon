@@ -8,21 +8,43 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    id("java")
+    id("com.gradleup.shadow") version "8.3.1"
 }
 
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
+version = "1.0"
 
+val jdaVersion = "5.2.3"
+val logbackVersion = "1.5.6"
+val jerseyVersion = "2.25.1"
+val jacksonVersion = "2.16.0"
+val junitVersion = "5.10.1"
 dependencies {
     // Use JUnit Jupiter for testing.
-    testImplementation(libs.junit.jupiter)
-
+    //testImplementation("libs.junit.jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("net.dv8tion:JDA:$jdaVersion")
+    implementation("io.github.cdimascio:dotenv-java:3.1.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    implementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    implementation("org.junit.jupiter:junit-jupiter:$junitVersion")
+    implementation("org.apache.httpcomponents:httpcore:4.4.1")
+    implementation("org.apache.httpcomponents:httpclient:4.5")
+    // testImplementation("junit", "junit","4.11")
+    // testImplementation("junit", "junit", "4.12")
+    implementation("javax.ws.rs:javax.ws.rs-api:2.0.1")
+    implementation("org.glassfish.jersey.core:jersey-server:$jerseyVersion")
+    implementation("org.glassfish.jersey:jersey-bom:$jerseyVersion")
+    implementation("org.glassfish.jersey.containers:jersey-container-servlet-core:$jerseyVersion")
     // This dependency is used by the application.
-    implementation(libs.guava)
+    //implementation("libs.guava")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
