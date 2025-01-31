@@ -19,7 +19,8 @@ public class Bot {
         JDA api = JDABuilder.createDefault(BOT_TOKEN).build();
 
         //Space to register listeners
-
+        api.addEventListener(new MyListeners());
+        
         //Space for slash commands
 
     }
