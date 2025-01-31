@@ -12,8 +12,12 @@ public class SlashCommandReceived extends ListenerAdapter{
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event){
         if(event.getMember().getUser().isBot()) return;
 
-        if(event.getName().equalsIgnoreCase("ping")){
-                event.reply("Pong!").setEphemeral(false).queue();
-            }
+        if(event.getName().equalsIgnoreCase("RecentSongs")){
+                event.reply("Your most recent listened to songs were:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
+        if(event.getName().equalsIgnoreCase("RecentArtists")){
+            event.reply("Your most recent listened to songs were:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
+        }
+    }
 }
+
