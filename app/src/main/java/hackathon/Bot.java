@@ -1,4 +1,4 @@
-import hackathon.App;
+package hackathon;
 
 public class Bot {
     public static void main(String[] args) {

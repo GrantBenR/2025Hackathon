@@ -1,3 +1,4 @@
+#CREDIT: https://stackoverflow.com/questions/61108021/gradle-and-docker-how-to-run-a-gradle-build-within-docker-container
 #Build stage
 
 FROM gradle:latest AS BUILD
