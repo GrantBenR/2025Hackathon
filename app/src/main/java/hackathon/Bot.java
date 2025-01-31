@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.JDABuilder;
 
 public class Bot {
 
+    public static String prefix;
     public static void main(String[] args) {
         
         //Grab the bot token from the .env file so it doesn't get pushed to github
@@ -20,8 +21,10 @@ public class Bot {
 
         //Space to register listeners
         api.addEventListener(new MyListeners());
-        
-        //Space for slash commands
+        api.addEventListener(new SlashCommandReceived());
 
+        //Space for slash commands
+        api.upsertCommand("ping", "Pings the bot and it will return \"Pong!\"").queue();
+        
     }
 }
