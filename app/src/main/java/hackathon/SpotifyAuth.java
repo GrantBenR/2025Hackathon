@@ -9,14 +9,25 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.cdimascio.dotenv.Dotenv;
+
 
 public class SpotifyAuth {
     //THIS IS DEFINITELY WRONG ---->>>
@@ -66,8 +77,6 @@ public class SpotifyAuth {
                 .POST(HttpRequest.BodyPublishers.ofString(uri.toString()))
                 .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            String code = response.body();
-            System.out.println(code);
             return 1;
         }
         catch (URISyntaxException e)
@@ -122,45 +131,34 @@ public class SpotifyAuth {
             throw new RuntimeException(e);
         }
     }
+    private static RequestConfig requestConfig = RequestConfig.custom().build();
     public static String getAccessToken(String code)
     {
-        HttpClient client = HttpClient.newHttpClient();
+        org.apache.http.client.HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
         ObjectMapper objectMapper = new ObjectMapper();
         HttpGet httpGet = new HttpGet(BASE_URL);
         Dotenv dotenv = Dotenv.load();
         String CLIENT_ID = dotenv.get("CLIENT_ID");
         String CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
         String clientData = CLIENT_ID + ":" + CLIENT_SECRET;
-        byte[] encodedBytes = Base64.getEncoder().encode(clientData.getBytes());
+        byte[] encodedBytes = Base64.getUrlEncoder().encode(clientData.getBytes());
         String encodedString = new String(encodedBytes);
+        System.out.println(encodedString);
         try {
-            URI uri = new URIBuilder(httpGet.getURI())
-                    .addParameter("code", code)
-                    .addParameter("grant_type", "authorization_code")
-                    .addParameter("redirect_uri", "http://localhost:8888/callback")
-                    .build();
-            System.out.println(uri.toString());
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(uri)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .header("Authorization", "Basic " + encodedString)
-                    .POST(HttpRequest.BodyPublishers.ofString(uri.toString()))
-                    .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            //String authToken = objectMapper.readValue(response.body(), new TypeReference<>() {});
-            String authToken = response.body();
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("code", code));
+            urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8888/callback"));
+            urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+            HttpPost httpPost = new HttpPost(BASE_URL);
+            httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+            httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            httpPost.setHeader("Authorization", "Basic " + encodedString);
+            HttpEntity response = client.execute(httpPost).getEntity();
+            String authToken = EntityUtils.toString(response);
             System.out.println("Authentication request response: " + authToken);
             return authToken;
         }
-        catch (URISyntaxException e)
-        {
-            throw new RuntimeException(e);
-        }
         catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (InterruptedException e)
         {
             throw new RuntimeException(e);
         }

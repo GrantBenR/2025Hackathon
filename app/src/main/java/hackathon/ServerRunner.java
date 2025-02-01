@@ -22,6 +22,7 @@ public class ServerRunner
             throw new RuntimeException(e);
         }
         server.createContext("/callback", new SpotifyAuthHandler());
+        server.createContext("/token", new SpotifyTokenAuthHandler());
         server.setExecutor(null); // creates a default executor
         server.start();
     }
@@ -31,10 +32,24 @@ public class ServerRunner
             String response = "You can close this window";
             String query = t.getRequestURI().getQuery();
             String shortQuery = query.substring(5,227);
+            System.out.println(shortQuery);
             SpotifyAuth.getAccessToken(shortQuery);
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
             os.write(shortQuery.getBytes());
+            os.close();
+        }
+    }
+    static class SpotifyTokenAuthHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            String response = "You can close this window";
+            // String query = t.getRequestURI().getQuery();
+            // String shortQuery = query.substring(5,227);
+            // SpotifyAuth.getAccessToken(shortQuery);
+            t.sendResponseHeaders(200, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
             os.close();
         }
     }
