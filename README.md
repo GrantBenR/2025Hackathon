@@ -1,7 +1,7 @@
 # Jukebox Jerk 🤖🎶
-Jukebox Jerk is a state of the art discord bot used to encourage users away from their terrible listening habits.
+Jukebox Jerk is a *state of the art* Discord Bot used to encourage users away from their terrible listening habits!
 
-View your recently listened to songs or artists and be told how to improve based on your listening statistics!
+View your top songs and artists to be told how to improve your listening statistics!
 
 ## Included Artists 🎤⭐
 - *Taylor Swift*
