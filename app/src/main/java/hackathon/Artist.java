@@ -28,7 +28,7 @@ public class Artist {
 
     @Override
     public String toString(){
-        return this.name;
+        return this.name + ": " + this.insultsList.get(1);
     }
     
     //Getter and setters
