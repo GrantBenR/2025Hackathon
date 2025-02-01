@@ -54,6 +54,7 @@ public class DatabaseConnection {
          AuthenticationToken = rs.getString("AuthenticationToken");
          RefreshToken = rs.getString("RefreshToken");
          DateCreated = rs.getString("DateCreated");
+         System.out.println("DiscordUserId: " + DiscordUserId + " AuthenticationToken: " + AuthenticationToken + " RefreshToken: " + RefreshToken + " Date Created: " + DateCreated);
          }
          return "";
       } 
@@ -63,5 +64,25 @@ public class DatabaseConnection {
          System.exit(0);
       }
       return null;
+   }
+   public static void InsertNewUserIntoDatabase(String DiscordUserId, String AuthenticationToken, String RefreshToken, String DateCreated)
+   {
+      Connection c = null;
+      try {
+         Class.forName("org.sqlite.JDBC");
+         c = DriverManager.getConnection("jdbc:sqlite:test.db");
+      } catch ( Exception e ) {
+         System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+         System.exit(0);
+      }
+      System.out.println("Opened database successfully");
+      String query = "INSERT INTO AuthObjects (DiscordUserId, AuthenticationToken, RefreshToken, DateCreated) VALUES (" + DiscordUserId + ", " + AuthenticationToken + ", " + RefreshToken + ", " + DateCreated + ");";
+      try (Statement stmt = c.createStatement()) {
+         stmt.executeUpdate(query);
+       } 
+       catch (SQLException e) {
+         System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+         System.exit(0);
+       }
    }
 }
