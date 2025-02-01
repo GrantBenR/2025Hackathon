@@ -52,8 +52,8 @@ public class SpotifyAuth {
             URI uri = new URIBuilder(httpGet.getURI())
                     .addParameter("response_type", "code")
                     .addParameter("client_id", clientId)
-                    .addParameter("redirect_uri", "http://localhost:5500/callback")
                     .addParameter("scope", "user-read-private user-read-email")
+                    .addParameter("redirect_uri", "https://localhost:8888/callback")
 //                    .addParameter("code_challenge_method", "S256")
 //                    .addParameter("code_challenge", codeChallenger)
                     .addParameter("state", state)
@@ -133,7 +133,7 @@ public class SpotifyAuth {
                     .addParameter("client_id", clientId)
                     .addParameter("grant_type", "authorization_code")
                     .addParameter("code", code)
-                    .addParameter("redirect_uri", "http://localhost:5500/callback")
+                    .addParameter("redirect_uri", "https://localhost:8888/callback")
                     .addParameter("code_verifier", codeVerifier)
                     .build();
             System.out.println(uri.toString());
