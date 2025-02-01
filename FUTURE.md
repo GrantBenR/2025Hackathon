@@ -11,6 +11,7 @@ Even though we were very content with what we were able to finish during the 24 
 - Cleaner output organization from the bot commands.
 - Additional commands, such as top *artists*, *recent* songs, and *recent* artists.
 - Better background processes for looping thorugh databases of sassy responses.
+- Implementation of Spotify API's Refresh Token service so that users don't have to redo authentication.
 
 ## Plans for Continuation 📜
 **Despite the the possibilities listed above, there are actively *no* plans to continue development with this bot.**
