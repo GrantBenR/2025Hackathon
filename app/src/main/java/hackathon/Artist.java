@@ -25,5 +25,38 @@ public class Artist {
 
     }
     
+    //Getter and setters
+        //Setters
+    public void setId(String id){
+        this.id = id;
+    }
 
+    public void setName(String name){
+        this.name = name;
+    }
+
+    public void setHREF(String href){
+        this.href = href;
+    }
+
+    public void setType(String type){
+        this.type = type;
+    }
+
+        //Getters
+    public String getId(){
+        return this.id;
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public String getHREF(){
+        return this.href;
+    }
+
+    public String getType(){
+        return this.type;
+    }
 }
