@@ -32,7 +32,7 @@ public class ArtistAssembler {
 
             // Read the 3 artists into an ArrayList
             ArrayList<String> insults = new ArrayList<>();
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 3; i++) {
                 insults.add(scnr.nextLine());
             }
 
@@ -41,9 +41,9 @@ public class ArtistAssembler {
             artistsList.add(newArtist);
 
             // Skip any blank lines (separators between objects)
-            while (scnr.hasNextLine() && scnr.nextLine().trim().isEmpty()) {
-                // Do nothing (just skip the blank line)
-            }
+            // while (scnr.hasNextLine() && scnr.nextLine().trim().isEmpty()) {
+            //     // Do nothing (just skip the blank line)
+            // }
         }
         return artistsList;
     }
