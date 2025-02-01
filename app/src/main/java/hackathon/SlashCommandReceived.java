@@ -26,14 +26,22 @@ public class SlashCommandReceived extends ListenerAdapter{
         //Command for recent songs (Spotify)
         if(event.getName().equalsIgnoreCase("recentsongs")){
             ArrayList<String> SongTitles = new ArrayList<>();
-            event.reply("Your most recent listened to songs were: \n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
+            event.reply("Your most recent listened to songs are: \n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
         else if(event.getName().equalsIgnoreCase("recentartists")){ //Command for recent artists (spotify)
             ArrayList<String> ArtistNames = new ArrayList<>();
-            event.reply("Your most recent listened to songs were:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
+            event.reply("Your most recent listened to artists are:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
         else if(event.getName().equalsIgnoreCase("ping")){ //Command for ping
             event.reply("Pong!").setEphemeral(false).queue();
+        }
+        else if(event.getName().equalsIgnoreCase("topartists")){ //Command for top artists (spotify)
+            ArrayList<String> ArtistNames = new ArrayList<>();
+            event.reply("Your top listened to artists are:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
+        }
+        else if(event.getName().equalsIgnoreCase("topsongs")){ //Command for top songs (spotify)
+            ArrayList<String> SongNames = new ArrayList<>();
+            event.reply("Your top most listened to songs are:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
     }
 
