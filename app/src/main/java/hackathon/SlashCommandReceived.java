@@ -31,6 +31,9 @@ public class SlashCommandReceived extends ListenerAdapter{
         else if(event.getName().equalsIgnoreCase("Recent_Artists")){ //Command for recent artists (spotify)
             event.reply("Your most recent listened to songs were:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
+        else if(event.getName().equalsIgnoreCase("ping")){ //Command for ping
+            event.reply("Pong!").setEphemeral(false).queue();;
+        }
     }
 
     /* 

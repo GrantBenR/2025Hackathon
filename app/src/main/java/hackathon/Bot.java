@@ -26,6 +26,6 @@ public class Bot {
         //Space for slash commands
         api.upsertCommand("Recent_Songs", "Displays your most recent listened to Spotify songs!").queue();
         api.upsertCommand("Recent_Artists", "Displays your most recent listened to Spotify artists!").queue();
-    
+        api.upsertCommand("ping", "Pings the bot which responds with \"Pong!\"");
     }
 }
