@@ -19,7 +19,7 @@ public class SlashCommandReceived extends ListenerAdapter{
 
         //Command for recent songs (Spotify)
         if(event.getName().equalsIgnoreCase("RecentSongs")){
-                event.reply("Your most recent listened to songs were:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
+            event.reply("Your most recent listened to songs were:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
 
         //Command for recent artists (spotify)
