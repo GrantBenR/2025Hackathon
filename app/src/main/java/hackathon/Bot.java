@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.JDABuilder;
 public class Bot {
 
     public static String prefix;
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         
         //Grab the bot token from the .env file so it doesn't get pushed to github
         Dotenv dotenv = Dotenv.load();
@@ -24,8 +24,8 @@ public class Bot {
         api.addEventListener(new SlashCommandReceived());
 
         //Space for slash commands
-        api.upsertCommand("RecentSongs", "Displays your most recent listened to Spotify songs!").queue();
-        api.upsertCommand("RecentArtists", "Displays your most recent listened to Spotify artists!").queue();
-    
+        api.upsertCommand("recentsongs", "Displays your most recent listened to Spotify songs!").queue();;
+        api.upsertCommand("recentartists", "Displays your most recent listened to Spotify artists!").queue();;
+        api.upsertCommand("ping", "Pings the bot which responds with \"Pong!\"").queue();
     }
 }
