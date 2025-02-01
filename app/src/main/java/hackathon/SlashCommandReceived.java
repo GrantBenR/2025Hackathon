@@ -25,26 +25,30 @@ public class SlashCommandReceived extends ListenerAdapter{
         if(event.getMember().getUser().isBot()) return;
 
         //Command for recent songs (Spotify)
-        if(event.getName().equalsIgnoreCase("RecentSongs")){
+        if(event.getName().equalsIgnoreCase("Recent_Songs")){
             event.reply("Your most recent listened to songs were:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
 
         //Command for recent artists (spotify)
-        if(event.getName().equalsIgnoreCase("RecentArtists")){
+        if(event.getName().equalsIgnoreCase("Recent_Artists")){
             event.reply("Your most recent listened to songs were:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
     }
 
-    // Global Command - Updates in about an hour - max 100
+    // Guild Command - Updates hopefully instantly - max 100
     @Override
-    public void onReady(ReadyEvent event){
-        
-        List<CommandData> commandData = new ArrayList<>();
-        
-        commandData.add(Commands.slash("RecentArtists", "Imports a list of the most recent artists"));
-        commandData.add(Commands.slash("RecentSongs", "Imports a list of the most recent songs"));
+    public void onGuildReady(GuildReadyEvent event) {
 
-        event.getJDA().updateCommands().addCommands(commandData).queue();
+        //List for commands
+        List<CommandData> commandData = new ArrayList<>();
+
+        //Add commands here for synchronization
+        commandData.add(Commands.slash("Recent_Songs", "Testing this crap"));
+        commandData.add(Commands.slash("Recent_Artists", "This better work"));
+
+        //UPDATE THE WHOLE LIST PLEASE
+        event.getGuild().updateCommands().addCommands(commandData).queue();
+
     }
 }
 
