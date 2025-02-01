@@ -19,7 +19,7 @@ View your recently listened to songs or artists and be told how to improve based
 - Justin Bieber
 - Imagine Dragons
 - Ed Sheeran
-- And more to come!
+- And many more!
 
 ## Video Demonstration 🎥
 Short Commercial: ```https://www.youtube.com/watch?v=0CFogsjroSY```
