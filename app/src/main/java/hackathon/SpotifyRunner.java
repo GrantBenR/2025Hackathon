@@ -8,6 +8,7 @@ public class SpotifyRunner
         ServerRunner serverRunner = new ServerRunner();
         System.out.println("Spotify Runner Start!");
         SpotifyAuth spotifyAuth = new SpotifyAuth();
+        String url = spotifyAuth.redirectToAuthCodeFlow();
         System.out.println("Spotify Auth Instantiation Complete");
     }
 }

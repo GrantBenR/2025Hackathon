@@ -33,7 +33,19 @@ public class MyListeners extends ListenerAdapter {
            channel.sendMessage("Pong!").queue(); //.queue() is important to use after sendMessage()
        }else if(content.equals("!authenticate")){
             MessageChannel channel = event.getChannel();
-            channel.sendMessage("Authentication Request in Progress").queue();
+            String DiscordUserId = event.getAuthor().getId();
+            Boolean isUserInDatabase = DatabaseConnection.CheckUserStatusInDatabase(DiscordUserId);
+            if (!isUserInDatabase)
+            {
+                channel.sendMessage("New Authentication Request in Progress").queue();
+                SpotifyAuth spotifyAuth = new SpotifyAuth();
+                String url = spotifyAuth.redirectToAuthCodeFlow();
+                channel.sendMessage(url).queue();
+            }
+            else
+            {
+                channel.sendMessage("User " + event.getAuthor().getName() + " Already Authenticated");
+            }
 
             //Implement here
 

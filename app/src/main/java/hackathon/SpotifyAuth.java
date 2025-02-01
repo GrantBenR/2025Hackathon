@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
@@ -25,6 +24,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -36,18 +36,18 @@ public class SpotifyAuth {
 
     public SpotifyAuth() {
         //Get spotify dev client data from .env
-        Dotenv dotenv = Dotenv.load();
-        String CLIENT_ID = dotenv.get("CLIENT_ID");
-        System.out.println(CLIENT_ID);
-        String CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
-        Integer returnStatus = redirectToAuthCodeFlow(CLIENT_ID);
-        if (returnStatus == 1)
-        {
-            System.out.println("SUCCESS");
-        }
+//        Dotenv dotenv = Dotenv.load();
+//        String CLIENT_ID = dotenv.get("CLIENT_ID");
+//        System.out.println(CLIENT_ID);
+//        String CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
+//        String url = redirectToAuthCodeFlow();
+//        if (url != null)
+//        {
+//            System.out.println("SUCCESS");
+//        }
     }
 
-    public Integer redirectToAuthCodeFlow(String clientId)
+    public String redirectToAuthCodeFlow()
     {
         Dotenv dotenv = Dotenv.load();
         String CLIENT_ID = dotenv.get("CLIENT_ID");
@@ -64,7 +64,7 @@ public class SpotifyAuth {
             String state = generateCodeVerifier(16);
             URI uri = new URIBuilder(httpGet.getURI())
                     .addParameter("response_type", "code")
-                    .addParameter("client_id", clientId)
+                    .addParameter("client_id", CLIENT_ID)
                     .addParameter("scope", "user-read-private user-read-email")
                     .addParameter("redirect_uri", "http://localhost:8888/callback")
 //                    .addParameter("code_challenge_method", "S256")
@@ -78,7 +78,7 @@ public class SpotifyAuth {
                 .POST(HttpRequest.BodyPublishers.ofString(uri.toString()))
                 .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return 1;
+            return uri.toString();
         }
         catch (URISyntaxException e)
         {
@@ -97,6 +97,9 @@ public class SpotifyAuth {
         }
         return null;
     }
+
+
+    //Part of PKCE Auth flow that is not in use
     public String generateCodeVerifier(int length)
     {
         String text = "";
@@ -107,6 +110,7 @@ public class SpotifyAuth {
         }
         return text;
     }
+    //Also part of PKCE auth flow
     public String generateCodeChallenge(String codeVerifier)
     {
         MessageDigest digest = null;
@@ -162,6 +166,39 @@ public class SpotifyAuth {
             String REFRESH_TOKEN = jsonNode.get("refresh_token").asText();
             System.out.println("Refresh Token: " + REFRESH_TOKEN);
             getCurrentUserProfile(AUTHENTICATION_TOKEN);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void getRefreshToken(String refresh_token)
+    {
+        org.apache.http.client.HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
+        Dotenv dotenv = Dotenv.load();
+        String CLIENT_ID = dotenv.get("CLIENT_ID");
+        String CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
+        String clientData = CLIENT_ID + ":" + CLIENT_SECRET;
+        byte[] encodedBytes = Base64.getUrlEncoder().encode(clientData.getBytes());
+        String encodedString = new String(encodedBytes);
+        System.out.println(encodedString);
+        try {
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("refresh_token", refresh_token));
+            urlParameters.add(new BasicNameValuePair("grant_type", "refresh_token"));
+            HttpPost httpPost = new HttpPost(BASE_URL);
+            httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+            httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            httpPost.setHeader("Authorization", "Basic " + encodedString);
+            HttpEntity response = client.execute(httpPost).getEntity();
+            String authTokenObject = EntityUtils.toString(response);
+            System.out.println("Authentication request response: " + authTokenObject);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(authTokenObject);
+            String AUTHENTICATION_TOKEN = jsonNode.get("access_token").asText();
+            System.out.println("Authentication Token: " + AUTHENTICATION_TOKEN);
+            String REFRESH_TOKEN = jsonNode.get("refresh_token").asText();
+            System.out.println("Refresh Token: " + REFRESH_TOKEN);
         }
         catch (IOException e)
         {

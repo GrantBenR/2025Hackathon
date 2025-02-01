@@ -26,6 +26,7 @@ val junitVersion = "5.10.1"
 dependencies {
     // Use JUnit Jupiter for testing.
     //testImplementation("libs.junit.jupiter")
+    implementation("org.xerial:sqlite-jdbc:3.30.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -56,7 +57,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "hackathon.Bot"
+    mainClass = "hackathon.DatabaseConnection"
 }
 
 tasks.named<Test>("test") {
