@@ -52,6 +52,9 @@ public class MyListeners extends ListenerAdapter {
                 counter++;
                 System.out.println("Counter: " + counter);
                 channel.sendMessage("User " + event.getAuthor().getName() + " Already Authenticated").queue();
+                SpotifyAuth spotifyAuth = new SpotifyAuth();
+                String url = spotifyAuth.redirectToAuthCodeFlow(DiscordUserId);
+                channel.sendMessage(url).queue();
             }
 
             //Implement here
@@ -74,7 +77,7 @@ public class MyListeners extends ListenerAdapter {
                 ArrayList<SpotifyTrack> topTracks = spotifyAuth.getCurrentUserTopTracks(authenticationToken);
                 topTracks.forEach(track ->
                 {
-                    //channel.sendMessageEmbeds(track.trackName);
+                    channel.sendMessage(track.toString()).queue();
 
                 });
         

@@ -187,7 +187,7 @@ public class SpotifyAuth {
                     DatabaseConnection.UpdateUserData(DiscordUserId, AUTHENTICATION_TOKEN, REFRESH_TOKEN, StartDate);
                 }
             }
-            getCurrentUserTopTracks(AUTHENTICATION_TOKEN);
+            //getCurrentUserTopTracks(AUTHENTICATION_TOKEN);
         }
         catch (IOException e)
         {
