@@ -1,13 +1,5 @@
 package hackathon;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.cdimascio.dotenv.Dotenv;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,21 +10,56 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class SpotifyAuth
-{
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.github.cdimascio.dotenv.Dotenv;
+
+public class SpotifyAuth {
     //THIS IS DEFINITELY WRONG ---->>>
     private final static String BASE_URL = "https://accounts.spotify.com/api/token";
-    public SpotifyAuth()
-    {
+
+    public SpotifyAuth() {
         //Get spotify dev client data from .env
+        Dotenv dotenv = Dotenv.load();
+        String CLIENT_ID = dotenv.get("CLIENT_ID");
+        String CLIENT_SECRET = dotenv.get("CLIENT_ID");
+        Integer returnStatus = redirectToAuthCodeFlow(CLIENT_ID);
+        if (returnStatus == 1)
+        {
+            System.out.println("SUCCESS");
+        }
+    }
+
+    public Integer redirectToAuthCodeFlow(String clientId)
+    {
         Dotenv dotenv = Dotenv.load();
         String CLIENT_ID = dotenv.get("CLIENT_ID");
         String CLIENT_SECRET = dotenv.get("CLIENT_ID");
         //Length indicated by spotify documentation
         String codeVerifier = generateCodeVerifier(128);
         String codeChallenger = generateCodeChallenge(codeVerifier);
-        String accessToken = getAccessToken(CLIENT_ID, codeChallenger, codeVerifier);
+        getAccessToken(CLIENT_ID, codeChallenger, codeVerifier);
 
+        HttpGet httpGet = new HttpGet("https://accounts.spotify.com/authorize");
+        try
+        {
+            URI uri = new URIBuilder(httpGet.getURI())
+                    .addParameter("client_id", clientId)
+                    .addParameter("response_type", "code")
+                    .addParameter("redirect_uri", "http://localhost:5500/callback")
+                    .addParameter("scope", "user-read-private user-read-email")
+                    .addParameter("code_challenge_method", "S256")
+                    .addParameter("code_challenge", codeChallenger)
+                    .build();
+            return 1;
+        }
+        catch (URISyntaxException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
     public String generateCodeVerifier(int length)
     {
@@ -89,7 +116,8 @@ public class SpotifyAuth
                     .POST(HttpRequest.BodyPublishers.ofString(uri.toString()))
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            String authToken = objectMapper.readValue(response.body(), new TypeReference<>() {});
+            //String authToken = objectMapper.readValue(response.body(), new TypeReference<>() {});
+            String authToken = response.body();
             System.out.println("Authentication request response: " + authToken);
             return authToken;
         }
@@ -105,21 +133,5 @@ public class SpotifyAuth
         {
             throw new RuntimeException(e);
         }
-//    const params = new URLSearchParams();
-//        params.append("client_id", clientId);
-//        params.append("grant_type", "authorization_code");
-//        params.append("code", code);
-//        params.append("redirect_uri", "http://localhost:5173/callback");
-//        params.append("code_verifier", verifier!);
-//
-//    const result = await fetch("https://accounts.spotify.com/api/token", {
-//                method: "POST",
-//                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-//        body: params
-//    });
-//
-//    const { access_token } = await result.json();
-//        return access_token;
-//    }
     }
 }
