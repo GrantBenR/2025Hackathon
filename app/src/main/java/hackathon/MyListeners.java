@@ -39,7 +39,7 @@ public class MyListeners extends ListenerAdapter {
             {
                 channel.sendMessage("New Authentication Request in Progress").queue();
                 SpotifyAuth spotifyAuth = new SpotifyAuth();
-                String url = spotifyAuth.redirectToAuthCodeFlow();
+                String url = spotifyAuth.redirectToAuthCodeFlow(DiscordUserId);
                 channel.sendMessage(url).queue();
             }
             else

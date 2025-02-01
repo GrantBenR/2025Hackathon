@@ -1,6 +1,11 @@
 package hackathon;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DatabaseConnection {
   public static void main( String args[] ) {
@@ -14,10 +19,30 @@ public class DatabaseConnection {
          System.exit(0);
       }
       System.out.println("Opened database successfully");
-      boolean isUserInDatabase = CheckUserStatusInDatabase("1234557799650");
-      System.out.println(isUserInDatabase);
-      //CREATE MAIN TABLE CODE (No longer necessary)
-
+      String query = "SELECT * FROM AuthObjects;";
+      try (PreparedStatement stmt = c.prepareStatement( query )) 
+      {
+         stmt.executeQuery();
+         ResultSet rs = stmt.executeQuery();
+         while (rs.next()) 
+         {
+            String DiscordUserId = "";
+            String AuthenticationToken = "";
+            String RefreshToken = "";
+            String DateCreated = "";
+            DiscordUserId = rs.getString("DiscordUserId");
+            AuthenticationToken = rs.getString("AuthenticationToken");
+            RefreshToken = rs.getString("RefreshToken");
+            DateCreated = rs.getString("DateCreated");
+            System.out.println("DiscordUserId: " + DiscordUserId + " AuthenticationToken: " + AuthenticationToken + " RefreshToken: " + RefreshToken + " Date Created: " + DateCreated);
+         }
+      } 
+      catch (SQLException e) 
+      {
+         System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+         System.exit(0);
+      }
+      
       // String query = "CREATE TABLE AuthObjects (AuthObjectsId INTEGER NOT NULL UNIQUE, DiscordUserId TEXT NOT NULL UNIQUE, AuthenticationToken TEXT NOT NULL, RefreshToken TEXT NOT NULL, DateCreated TEXT NOT NULL, PRIMARY KEY (AuthObjectsId AUTOINCREMENT));";
       // try (Statement stmt = c.createStatement()) {
       //    stmt.executeUpdate(query);
@@ -47,7 +72,7 @@ public class DatabaseConnection {
          String RefreshToken = "";
          String DateCreated = "";
          stmt.setString(1, userId);
-         ResultSet rs = stmt.executeQuery(query);
+         ResultSet rs = stmt.executeQuery();
          while (rs.next()) 
          {
             DiscordUserId = rs.getString("DiscordUserId");
@@ -83,7 +108,7 @@ public class DatabaseConnection {
           pstmt.setString( 2, AuthenticationToken);
           pstmt.setString( 3, RefreshToken);
           pstmt.setString( 4, DateCreated);
-          pstmt.executeUpdate(query);
+          pstmt.executeUpdate();
       } 
       catch (SQLException e) 
       {
@@ -112,7 +137,7 @@ public class DatabaseConnection {
          String RefreshToken = "";
          String DateCreated = "";
          pstmt.setString( 1, userId);
-         ResultSet rs = pstmt.executeQuery(query);
+         ResultSet rs = pstmt.executeQuery();
          while (rs.next()) 
          {
             AuthObjectsId = rs.getString("AuthObjectsId");
@@ -148,7 +173,7 @@ public class DatabaseConnection {
        pstmt.setString( 2, RefreshToken);
        pstmt.setString( 3, DateCreated);
        pstmt.setString( 4, DiscordUserId);
-       pstmt.executeUpdate(query);
+       pstmt.executeUpdate();
        return true;
    }
 }

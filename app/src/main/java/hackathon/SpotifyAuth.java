@@ -9,6 +9,8 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -33,7 +35,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 public class SpotifyAuth {
     //THIS IS DEFINITELY WRONG ---->>>
     private final static String BASE_URL = "https://accounts.spotify.com/api/token";
-
+    public static String DiscordUserId;
     public SpotifyAuth() {
         //Get spotify dev client data from .env
 //        Dotenv dotenv = Dotenv.load();
@@ -47,8 +49,9 @@ public class SpotifyAuth {
 //        }
     }
 
-    public String redirectToAuthCodeFlow()
+    public String redirectToAuthCodeFlow(String discordUserId)
     {
+        DiscordUserId = discordUserId;
         Dotenv dotenv = Dotenv.load();
         String CLIENT_ID = dotenv.get("CLIENT_ID");
         String CLIENT_SECRET = dotenv.get("CLIENT_ID");
@@ -165,10 +168,28 @@ public class SpotifyAuth {
             System.out.println("Authentication Token: " + AUTHENTICATION_TOKEN);
             String REFRESH_TOKEN = jsonNode.get("refresh_token").asText();
             System.out.println("Refresh Token: " + REFRESH_TOKEN);
+            String StartDate = Instant.now().toString();
+            if (DiscordUserId == null)
+            {
+                System.out.println("Discord User ID was found null when preparing Authentication Token");
+            }
+            else
+            {
+                if (DatabaseConnection.CheckUserStatusInDatabase(DiscordUserId) == false)
+                {
+                    DatabaseConnection.InsertNewUserIntoDatabase(DiscordUserId, AUTHENTICATION_TOKEN, REFRESH_TOKEN, StartDate);
+                }
+                else
+                {
+                    DatabaseConnection.UpdateUserData(DiscordUserId, AUTHENTICATION_TOKEN, REFRESH_TOKEN, StartDate);
+                }
+            }
             getCurrentUserProfile(AUTHENTICATION_TOKEN);
         }
         catch (IOException e)
         {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
