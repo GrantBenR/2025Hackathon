@@ -33,7 +33,6 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 
 public class SpotifyAuth {
-    //THIS IS DEFINITELY WRONG ---->>>
     private final static String BASE_URL = "https://accounts.spotify.com/api/token";
     public static String DiscordUserId;
     public SpotifyAuth() {
@@ -68,7 +67,7 @@ public class SpotifyAuth {
             URI uri = new URIBuilder(httpGet.getURI())
                     .addParameter("response_type", "code")
                     .addParameter("client_id", CLIENT_ID)
-                    .addParameter("scope", "user-read-private user-read-email")
+                    .addParameter("scope", "user-read-private user-read-email user-library-read playlist-read-private user-read-currently-playing user-top-read user-follow-read")
                     .addParameter("redirect_uri", "http://localhost:8888/callback")
 //                    .addParameter("code_challenge_method", "S256")
 //                    .addParameter("code_challenge", codeChallenger)
@@ -177,14 +176,16 @@ public class SpotifyAuth {
             {
                 if (DatabaseConnection.CheckUserStatusInDatabase(DiscordUserId) == false)
                 {
+                    System.out.println("Inserting new user into the database with id: " + DiscordUserId);
                     DatabaseConnection.InsertNewUserIntoDatabase(DiscordUserId, AUTHENTICATION_TOKEN, REFRESH_TOKEN, StartDate);
                 }
                 else
                 {
+                    System.out.println("Updating user in the database with id: " + DiscordUserId);
                     DatabaseConnection.UpdateUserData(DiscordUserId, AUTHENTICATION_TOKEN, REFRESH_TOKEN, StartDate);
                 }
             }
-            getCurrentUserProfile(AUTHENTICATION_TOKEN);
+            getCurrentUserTopTracks(AUTHENTICATION_TOKEN);
         }
         catch (IOException e)
         {
@@ -269,9 +270,20 @@ public class SpotifyAuth {
     public static void getCurrentUserTopTracks(String token)
     {
         HttpClient client = HttpClient.newHttpClient();
-        String endpoint = "https://api.spotify.com/v1/me/top/tracks";
+        HttpGet httpGet = new HttpGet("https://api.spotify.com/v1/me/top/tracks");
+        URI uri = null;
+        try
+        {
+            uri = new URIBuilder(httpGet.getURI())
+                    .addParameter("scope", "user-top-read")
+                    .build();
+        }
+        catch (URISyntaxException e)
+        {
+            throw new RuntimeException(e);
+        }
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(endpoint))
+                .uri(uri)
                 .header("Authorization", ("Bearer " + token))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .GET()
