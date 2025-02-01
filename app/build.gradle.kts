@@ -57,7 +57,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "hackathon.DatabaseConnection"
+    mainClass = "hackathon.Bot"
 }
 
 tasks.named<Test>("test") {
