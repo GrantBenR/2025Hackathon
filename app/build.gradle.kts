@@ -56,7 +56,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "hackathon.Bot"
+    mainClass = "hackathon.SpotifyRunner"
 }
 
 tasks.named<Test>("test") {
