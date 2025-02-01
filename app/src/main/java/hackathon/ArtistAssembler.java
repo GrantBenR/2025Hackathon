@@ -1,5 +1,7 @@
 package hackathon;
 
+import java.lang.reflect.Array;
+import java.nio.file.Paths;
 import java.util.*;
 import java.io.*;
 
@@ -8,18 +10,21 @@ import java.io.*;
  */
 public class ArtistAssembler {
 
-    public static void main(String[] args) throws Exception{
-        //Variables
-        String fileName = "InsultInfo.txt";
+    public static void main(String[] args) throws Exception
+    {
 
+    }
+    public static ArrayList<Artist> CreateInsultsArray() throws FileNotFoundException {
+        String absolutePath = Paths.get("").toAbsolutePath().getParent().toString();
+        String fileName = absolutePath + "/InsultInfo.txt";
         FileInputStream fInStream = new FileInputStream(fileName);
         Scanner scnr = new Scanner(fInStream);
 
         ArrayList<Artist> artistsList = new ArrayList<>();
-        
+
         while (scnr.hasNextLine()) {
             String name = "";
-            
+
             // Read name
             if(scnr.hasNextLine()){
                 name = scnr.nextLine();
@@ -33,12 +38,13 @@ public class ArtistAssembler {
 
             // Create and print MyObject instance
             Artist newArtist = new Artist("", "", "", name, insults);
-            System.out.println(newArtist.toString());
+            artistsList.add(newArtist);
 
             // Skip any blank lines (separators between objects)
             while (scnr.hasNextLine() && scnr.nextLine().trim().isEmpty()) {
                 // Do nothing (just skip the blank line)
             }
         }
+        return artistsList;
     }
 }
