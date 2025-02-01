@@ -27,5 +27,7 @@ public class Bot {
         api.upsertCommand("topsongs", "Displays your top listened to Spotify songs!").queue();;
         api.upsertCommand("topartists", "Displays your top listened to Spotify artists!").queue();;
         api.upsertCommand("ping", "Pings the bot which responds with \"Pong!\"").queue();
+        api.upsertCommand("recentartists", "Displays your most recent listened to Spotify artists!").queue();
+        api.upsertCommand("recentsongs", "Displays your most recent listened to Spotify songs!").queue();
     }
 }
