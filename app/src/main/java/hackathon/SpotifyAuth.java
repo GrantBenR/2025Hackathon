@@ -9,14 +9,26 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.cdimascio.dotenv.Dotenv;
+
 
 public class SpotifyAuth {
     //THIS IS DEFINITELY WRONG ---->>>
@@ -66,8 +78,6 @@ public class SpotifyAuth {
                 .POST(HttpRequest.BodyPublishers.ofString(uri.toString()))
                 .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            String code = response.body();
-            System.out.println(code);
             return 1;
         }
         catch (URISyntaxException e)
@@ -122,45 +132,138 @@ public class SpotifyAuth {
             throw new RuntimeException(e);
         }
     }
-    public static String getAccessToken(String code)
+    private static RequestConfig requestConfig = RequestConfig.custom().build();
+    public static void getAccessToken(String code)
     {
-        HttpClient client = HttpClient.newHttpClient();
-        ObjectMapper objectMapper = new ObjectMapper();
-        HttpGet httpGet = new HttpGet(BASE_URL);
+        org.apache.http.client.HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
         Dotenv dotenv = Dotenv.load();
         String CLIENT_ID = dotenv.get("CLIENT_ID");
         String CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
         String clientData = CLIENT_ID + ":" + CLIENT_SECRET;
-        byte[] encodedBytes = Base64.getEncoder().encode(clientData.getBytes());
+        byte[] encodedBytes = Base64.getUrlEncoder().encode(clientData.getBytes());
         String encodedString = new String(encodedBytes);
+        System.out.println(encodedString);
         try {
-            URI uri = new URIBuilder(httpGet.getURI())
-                    .addParameter("code", code)
-                    .addParameter("grant_type", "authorization_code")
-                    .addParameter("redirect_uri", "http://localhost:8888/callback")
-                    .build();
-            System.out.println(uri.toString());
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(uri)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .header("Authorization", "Basic " + encodedString)
-                    .POST(HttpRequest.BodyPublishers.ofString(uri.toString()))
-                    .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            //String authToken = objectMapper.readValue(response.body(), new TypeReference<>() {});
-            String authToken = response.body();
-            System.out.println("Authentication request response: " + authToken);
-            return authToken;
-        }
-        catch (URISyntaxException e)
-        {
-            throw new RuntimeException(e);
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("code", code));
+            urlParameters.add(new BasicNameValuePair("redirect_uri", "http://localhost:8888/callback"));
+            urlParameters.add(new BasicNameValuePair("grant_type", "authorization_code"));
+            HttpPost httpPost = new HttpPost(BASE_URL);
+            httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+            httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            httpPost.setHeader("Authorization", "Basic " + encodedString);
+            HttpEntity response = client.execute(httpPost).getEntity();
+            String authTokenObject = EntityUtils.toString(response);
+            System.out.println("Authentication request response: " + authTokenObject);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(authTokenObject);
+            String AUTHENTICATION_TOKEN = jsonNode.get("access_token").asText();
+            System.out.println("Authentication Token: " + AUTHENTICATION_TOKEN);
+            String REFRESH_TOKEN = jsonNode.get("refresh_token").asText();
+            System.out.println("Refresh Token: " + REFRESH_TOKEN);
+            getCurrentUserProfile(AUTHENTICATION_TOKEN);
         }
         catch (IOException e)
         {
             throw new RuntimeException(e);
         }
-        catch (InterruptedException e)
+    }
+    public static void getCurrentUserProfile(String token)
+    {
+        HttpClient client = HttpClient.newHttpClient();
+        String endpoint = "https://api.spotify.com/v1/me";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", ("Bearer " + token))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .GET()
+                .build();
+        try
+        {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        }
+        catch (IOException | InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void getCurrentUserTopArtists(String token)
+    {
+        HttpClient client = HttpClient.newHttpClient();
+        String endpoint = "https://api.spotify.com/v1/me/top/artists";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", ("Bearer " + token))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .GET()
+                .build();
+        try
+        {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        }
+        catch (IOException | InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void getCurrentUserTopTracks(String token)
+    {
+        HttpClient client = HttpClient.newHttpClient();
+        String endpoint = "https://api.spotify.com/v1/me/top/tracks";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", ("Bearer " + token))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .GET()
+                .build();
+        try
+        {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        }
+        catch (IOException | InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void getCurrentUserFollowedArtists(String token)
+    {
+        HttpClient client = HttpClient.newHttpClient();
+        String endpoint = "https://api.spotify.com/v1/me/following?type=artist";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", ("Bearer " + token))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .GET()
+                .build();
+        try
+        {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        }
+        catch (IOException | InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void getDoesCurrentUserFollowArtist(String token, String artistId)
+    {
+        HttpClient client = HttpClient.newHttpClient();
+        String endpoint = "https://api.spotify.com/v1/me/following/contains?type=artist&ids=" + artistId;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", ("Bearer " + token))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .GET()
+                .build();
+        try
+        {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        }
+        catch (IOException | InterruptedException e)
         {
             throw new RuntimeException(e);
         }

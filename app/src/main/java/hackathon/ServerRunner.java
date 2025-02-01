@@ -31,6 +31,7 @@ public class ServerRunner
             String response = "You can close this window";
             String query = t.getRequestURI().getQuery();
             String shortQuery = query.substring(5,227);
+            System.out.println(shortQuery);
             SpotifyAuth.getAccessToken(shortQuery);
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
@@ -38,5 +39,4 @@ public class ServerRunner
             os.close();
         }
     }
-
 }
