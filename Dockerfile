@@ -10,7 +10,7 @@ RUN gradle build
 
 FROM openjdk:latest
 ENV JAR_NAME=app-1.0.jar
-ENV APP_HOME=/usr/app/
+ENV APP_HOME=/usr/app
 WORKDIR $APP_HOME
 COPY --from=BUILD $APP_HOME .
 EXPOSE 8080
