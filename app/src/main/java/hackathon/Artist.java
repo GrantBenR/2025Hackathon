@@ -11,7 +11,8 @@ public class Artist {
     private String type = "artist";
     private String name;
 
-    private ArrayList<String> insultsList;
+    public ArrayList<String> insultsList;
+
     //Artist Constructor
     public Artist(String id, String href, String type, String name, ArrayList<String> insultsList){
         
@@ -24,6 +25,44 @@ public class Artist {
         this.insultsList = insultsList;
 
     }
-    
 
+    @Override
+    public String toString(){
+        return this.name;
+    }
+    
+    //Getter and setters
+        //Setters
+    public void setId(String id){
+        this.id = id;
+    }
+
+    public void setName(String name){
+        this.name = name;
+    }
+
+    public void setHREF(String href){
+        this.href = href;
+    }
+
+    public void setType(String type){
+        this.type = type;
+    }
+
+        //Getters
+    public String getId(){
+        return this.id;
+    }
+
+    public String getName(){
+        return this.name;
+    }
+
+    public String getHREF(){
+        return this.href;
+    }
+
+    public String getType(){
+        return this.type;
+    }
 }
