@@ -11,7 +11,8 @@ public class Artist {
     private String type = "artist";
     private String name;
 
-    private ArrayList<String> insultsList;
+    public ArrayList<String> insultsList;
+    
     //Artist Constructor
     public Artist(String id, String href, String type, String name, ArrayList<String> insultsList){
         
