@@ -19,11 +19,6 @@ public class ArtistAssembler {
         
         while (scnr.hasNextLine()) {
             String name = "";
-
-            // Skip any leading blank lines
-            while (scnr.hasNextLine() && scnr.nextLine().trim().isEmpty()) {
-                // Do nothing, just skip the blank line
-            }
             
             // Read name
             if(scnr.hasNextLine()){
@@ -32,8 +27,8 @@ public class ArtistAssembler {
 
             // Read the 3 artists into an ArrayList
             ArrayList<String> insults = new ArrayList<>();
-            for (int i = 0; i < 3 && scnr.hasNextLine(); i++) {
-                insults.add(scnr.nextLine().trim());
+            for (int i = 0; i < 2; i++) {
+                insults.add(scnr.nextLine());
             }
 
             // Create and print MyObject instance
