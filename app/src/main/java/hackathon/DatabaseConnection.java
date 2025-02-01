@@ -29,7 +29,7 @@ public class DatabaseConnection {
       //    System.exit(0);
       //  }
    }
-   public static String CheckUserStatusInDatabase(String userId)
+   public static Boolean CheckUserStatusInDatabase(String userId)
    {
       Connection c = null;
       
@@ -56,14 +56,14 @@ public class DatabaseConnection {
          DateCreated = rs.getString("DateCreated");
          System.out.println("DiscordUserId: " + DiscordUserId + " AuthenticationToken: " + AuthenticationToken + " RefreshToken: " + RefreshToken + " Date Created: " + DateCreated);
          }
-         return "";
+         return true;
       } 
       catch (SQLException e) 
       {
          System.err.println( e.getClass().getName() + ": " + e.getMessage() );
          System.exit(0);
       }
-      return null;
+      return false;
    }
    public static void InsertNewUserIntoDatabase(String DiscordUserId, String AuthenticationToken, String RefreshToken, String DateCreated)
    {
@@ -77,12 +77,14 @@ public class DatabaseConnection {
       }
       System.out.println("Opened database successfully");
       String query = "INSERT INTO AuthObjects (DiscordUserId, AuthenticationToken, RefreshToken, DateCreated) VALUES (" + DiscordUserId + ", " + AuthenticationToken + ", " + RefreshToken + ", " + DateCreated + ");";
-      try (Statement stmt = c.createStatement()) {
+      try (Statement stmt = c.createStatement()) 
+      {
          stmt.executeUpdate(query);
-       } 
-       catch (SQLException e) {
+      } 
+      catch (SQLException e) 
+      {
          System.err.println( e.getClass().getName() + ": " + e.getMessage() );
          System.exit(0);
-       }
+      }
    }
 }
