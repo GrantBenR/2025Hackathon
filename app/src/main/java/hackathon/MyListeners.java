@@ -33,10 +33,10 @@ public class MyListeners extends ListenerAdapter {
            channel.sendMessage("Pong!").queue(); //.queue() is important to use after sendMessage()
        }else if(content.equals("!authenticate")){
             MessageChannel channel = event.getChannel();
-            channel.sendMessage("Authentication Request in Progress");
+            channel.sendMessage("Authentication Request in Progress").queue();
 
             //Implement here
-            
+
        }
     }
     
