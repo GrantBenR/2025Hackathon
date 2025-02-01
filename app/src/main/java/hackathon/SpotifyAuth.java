@@ -28,6 +28,7 @@ import org.apache.http.util.EntityUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -69,8 +70,8 @@ public class SpotifyAuth {
                     .addParameter("client_id", CLIENT_ID)
                     .addParameter("scope", "user-read-private user-read-email user-library-read playlist-read-private user-read-currently-playing user-top-read user-follow-read")
                     .addParameter("redirect_uri", "http://localhost:8888/callback")
-//                    .addParameter("code_challenge_method", "S256")
-//                    .addParameter("code_challenge", codeChallenger)
+//                  .addParameter("code_challenge_method", "S256")
+//                  .addParameter("code_challenge", codeChallenger)
                     .addParameter("state", state)
                     .build();
             System.out.println(uri.toString());
@@ -291,7 +292,12 @@ public class SpotifyAuth {
         try
         {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.body());
+//            System.out.println(response.body());
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode fullJsonNode = mapper.readTree(response.body());
+            JsonNode itemsJsonNode =  fullJsonNode.get("items");
+            System.out.println(itemsJsonNode.toString());
+            
         }
         catch (IOException | InterruptedException e)
         {
