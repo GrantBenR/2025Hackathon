@@ -4,8 +4,8 @@ package hackathon;
 import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.entities.channel.middleman.*;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class MyListeners extends ListenerAdapter {
@@ -35,6 +35,7 @@ public class MyListeners extends ListenerAdapter {
             MessageChannel channel = event.getChannel();
             String DiscordUserId = event.getAuthor().getId();
             Boolean isUserInDatabase = DatabaseConnection.CheckUserStatusInDatabase(DiscordUserId);
+            System.out.println(isUserInDatabase);
             if (!isUserInDatabase)
             {
                 channel.sendMessage("New Authentication Request in Progress").queue();
@@ -44,7 +45,7 @@ public class MyListeners extends ListenerAdapter {
             }
             else
             {
-                channel.sendMessage("User " + event.getAuthor().getName() + " Already Authenticated");
+                channel.sendMessage("User " + event.getAuthor().getName() + " Already Authenticated").queue();
             }
 
             //Implement here
