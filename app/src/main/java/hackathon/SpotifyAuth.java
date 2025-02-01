@@ -168,6 +168,39 @@ public class SpotifyAuth {
             throw new RuntimeException(e);
         }
     }
+    public static void getRefreshToken(String refresh_token)
+    {
+        org.apache.http.client.HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
+        Dotenv dotenv = Dotenv.load();
+        String CLIENT_ID = dotenv.get("CLIENT_ID");
+        String CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
+        String clientData = CLIENT_ID + ":" + CLIENT_SECRET;
+        byte[] encodedBytes = Base64.getUrlEncoder().encode(clientData.getBytes());
+        String encodedString = new String(encodedBytes);
+        System.out.println(encodedString);
+        try {
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("refresh_token", refresh_token));
+            urlParameters.add(new BasicNameValuePair("grant_type", "refresh_token"));
+            HttpPost httpPost = new HttpPost(BASE_URL);
+            httpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
+            httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            httpPost.setHeader("Authorization", "Basic " + encodedString);
+            HttpEntity response = client.execute(httpPost).getEntity();
+            String authTokenObject = EntityUtils.toString(response);
+            System.out.println("Authentication request response: " + authTokenObject);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(authTokenObject);
+            String AUTHENTICATION_TOKEN = jsonNode.get("access_token").asText();
+            System.out.println("Authentication Token: " + AUTHENTICATION_TOKEN);
+            String REFRESH_TOKEN = jsonNode.get("refresh_token").asText();
+            System.out.println("Refresh Token: " + REFRESH_TOKEN);
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
     public static void getCurrentUserProfile(String token)
     {
         HttpClient client = HttpClient.newHttpClient();
