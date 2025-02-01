@@ -1,12 +1,12 @@
 package hackathon;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 public class ServerRunner
 {
@@ -28,11 +28,13 @@ public class ServerRunner
     static class SpotifyAuthHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
-            String response = "This is the response";
-            System.out.println(t.getRequestBody());
+            String response = "You can close this window";
+            String query = t.getRequestURI().getQuery();
+            String shortQuery = query.substring(5,227);
+            SpotifyAuth.getAccessToken(shortQuery);
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
-            os.write(response.getBytes());
+            os.write(shortQuery.getBytes());
             os.close();
         }
     }

@@ -9,6 +9,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -26,7 +27,7 @@ public class SpotifyAuth {
         Dotenv dotenv = Dotenv.load();
         String CLIENT_ID = dotenv.get("CLIENT_ID");
         System.out.println(CLIENT_ID);
-        String CLIENT_SECRET = dotenv.get("CLIENT_ID");
+        String CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
         Integer returnStatus = redirectToAuthCodeFlow(CLIENT_ID);
         if (returnStatus == 1)
         {
@@ -53,7 +54,7 @@ public class SpotifyAuth {
                     .addParameter("response_type", "code")
                     .addParameter("client_id", clientId)
                     .addParameter("scope", "user-read-private user-read-email")
-                    .addParameter("redirect_uri", "https://localhost:8888/callback")
+                    .addParameter("redirect_uri", "http://localhost:8888/callback")
 //                    .addParameter("code_challenge_method", "S256")
 //                    .addParameter("code_challenge", codeChallenger)
                     .addParameter("state", state)
@@ -67,7 +68,6 @@ public class SpotifyAuth {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             String code = response.body();
             System.out.println(code);
-            String accessToken = getAccessToken(CLIENT_ID, codeChallenger, codeVerifier);
             return 1;
         }
         catch (URISyntaxException e)
@@ -122,24 +122,28 @@ public class SpotifyAuth {
             throw new RuntimeException(e);
         }
     }
-    public String getAccessToken(String clientId, String code, String codeVerifier)
+    public static String getAccessToken(String code)
     {
         HttpClient client = HttpClient.newHttpClient();
         ObjectMapper objectMapper = new ObjectMapper();
         HttpGet httpGet = new HttpGet(BASE_URL);
-
+        Dotenv dotenv = Dotenv.load();
+        String CLIENT_ID = dotenv.get("CLIENT_ID");
+        String CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
+        String clientData = CLIENT_ID + ":" + CLIENT_SECRET;
+        byte[] encodedBytes = Base64.getEncoder().encode(clientData.getBytes());
+        String encodedString = new String(encodedBytes);
         try {
             URI uri = new URIBuilder(httpGet.getURI())
-                    .addParameter("client_id", clientId)
-                    .addParameter("grant_type", "authorization_code")
                     .addParameter("code", code)
-                    .addParameter("redirect_uri", "https://localhost:8888/callback")
-                    .addParameter("code_verifier", codeVerifier)
+                    .addParameter("grant_type", "authorization_code")
+                    .addParameter("redirect_uri", "http://localhost:8888/callback")
                     .build();
             System.out.println(uri.toString());
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(uri)
                     .header("Content-Type", "application/x-www-form-urlencoded")
+                    .header("Authorization", "Basic " + encodedString)
                     .POST(HttpRequest.BodyPublishers.ofString(uri.toString()))
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
