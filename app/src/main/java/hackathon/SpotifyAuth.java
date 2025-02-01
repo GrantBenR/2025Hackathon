@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
@@ -33,7 +35,6 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 
 public class SpotifyAuth {
-    //THIS IS DEFINITELY WRONG ---->>>
     private final static String BASE_URL = "https://accounts.spotify.com/api/token";
     public static String DiscordUserId;
     public SpotifyAuth() {
@@ -68,10 +69,10 @@ public class SpotifyAuth {
             URI uri = new URIBuilder(httpGet.getURI())
                     .addParameter("response_type", "code")
                     .addParameter("client_id", CLIENT_ID)
-                    .addParameter("scope", "user-read-private user-read-email")
+                    .addParameter("scope", "user-read-private user-read-email user-library-read playlist-read-private user-read-currently-playing user-top-read user-follow-read")
                     .addParameter("redirect_uri", "http://localhost:8888/callback")
-//                    .addParameter("code_challenge_method", "S256")
-//                    .addParameter("code_challenge", codeChallenger)
+//                  .addParameter("code_challenge_method", "S256")
+//                  .addParameter("code_challenge", codeChallenger)
                     .addParameter("state", state)
                     .build();
             System.out.println(uri.toString());
@@ -177,14 +178,16 @@ public class SpotifyAuth {
             {
                 if (DatabaseConnection.CheckUserStatusInDatabase(DiscordUserId) == false)
                 {
+                    System.out.println("Inserting new user into the database with id: " + DiscordUserId);
                     DatabaseConnection.InsertNewUserIntoDatabase(DiscordUserId, AUTHENTICATION_TOKEN, REFRESH_TOKEN, StartDate);
                 }
                 else
                 {
+                    System.out.println("Updating user in the database with id: " + DiscordUserId);
                     DatabaseConnection.UpdateUserData(DiscordUserId, AUTHENTICATION_TOKEN, REFRESH_TOKEN, StartDate);
                 }
             }
-            getCurrentUserProfile(AUTHENTICATION_TOKEN);
+            getCurrentUserTopTracks(AUTHENTICATION_TOKEN);
         }
         catch (IOException e)
         {
@@ -266,12 +269,23 @@ public class SpotifyAuth {
             throw new RuntimeException(e);
         }
     }
-    public static void getCurrentUserTopTracks(String token)
+    public static ArrayList<SpotifyTrack> getCurrentUserTopTracks(String token)
     {
         HttpClient client = HttpClient.newHttpClient();
-        String endpoint = "https://api.spotify.com/v1/me/top/tracks";
+        HttpGet httpGet = new HttpGet("https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=10&offset=0");
+        URI uri = null;
+        try
+        {
+            uri = new URIBuilder(httpGet.getURI())
+                    .addParameter("scope", "user-top-read")
+                    .build();
+        }
+        catch (URISyntaxException e)
+        {
+            throw new RuntimeException(e);
+        }
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(endpoint))
+                .uri(uri)
                 .header("Authorization", ("Bearer " + token))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .GET()
@@ -279,7 +293,41 @@ public class SpotifyAuth {
         try
         {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.body());
+//            System.out.println(response.body());
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode fullJsonNode = mapper.readTree(response.body());
+            ArrayNode itemsJsonNode = (ArrayNode) fullJsonNode.get("items");
+            System.out.println(itemsJsonNode.toString());
+            ArrayList<SpotifyTrack> spotifyTracks = new ArrayList<SpotifyTrack>();
+            for (int i = 0; i < itemsJsonNode.size(); i++ )
+            {
+                JsonNode albumNode = itemsJsonNode.get(i).get("album");
+                String albumName = albumNode.get("name").toString();
+                String releaseDate = albumNode.get("release_date").toString();
+                ArrayNode imagesNode = (ArrayNode) albumNode.get("images");
+                ArrayList<String> albumCovers = new ArrayList<String>();
+                for (int j = 0; j < imagesNode.size(); j++ )
+                {
+                    albumCovers.add(imagesNode.get(j).get("url").toString());
+                }
+                Album album = new Album(albumCovers, releaseDate, albumName);
+
+                ArrayNode artistsNode = (ArrayNode) itemsJsonNode.get(i).get("artists");
+                ArrayList<SpotifyArtist> artistsArray = new ArrayList<SpotifyArtist>();
+                for (int j = 0; j < artistsNode.size(); j++ )
+                {
+                    String artistName = artistsNode.get(j).get("name").toString();
+                    String artistType = artistsNode.get(j).get("type").toString();
+                    String artistHref = artistsNode.get(j).get("href").toString();
+                    String artistId = artistsNode.get(j).get("id").toString();
+                    SpotifyArtist newArtist = new SpotifyArtist(artistId, artistHref, artistType, artistName);
+                    artistsArray.add(newArtist);
+                }
+                String trackName = itemsJsonNode.get(i).get("name").toString();
+                String trackUrl = itemsJsonNode.get(i).get("external_urls").get("spotify").toString();
+                spotifyTracks.add(new SpotifyTrack(artistsArray, album, trackName, trackUrl));
+            }
+            return spotifyTracks;
         }
         catch (IOException | InterruptedException e)
         {

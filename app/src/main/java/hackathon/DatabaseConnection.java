@@ -5,43 +5,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class DatabaseConnection {
   public static void main( String args[] ) {
-      Connection c = null;
-      
-      try {
-         Class.forName("org.sqlite.JDBC");
-         c = DriverManager.getConnection("jdbc:sqlite:test.db");
-      } catch ( Exception e ) {
-         System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-         System.exit(0);
-      }
-      System.out.println("Opened database successfully");
-      String query = "SELECT * FROM AuthObjects;";
-      try (PreparedStatement stmt = c.prepareStatement( query )) 
-      {
-         stmt.executeQuery();
-         ResultSet rs = stmt.executeQuery();
-         while (rs.next()) 
-         {
-            String DiscordUserId = "";
-            String AuthenticationToken = "";
-            String RefreshToken = "";
-            String DateCreated = "";
-            DiscordUserId = rs.getString("DiscordUserId");
-            AuthenticationToken = rs.getString("AuthenticationToken");
-            RefreshToken = rs.getString("RefreshToken");
-            DateCreated = rs.getString("DateCreated");
-            System.out.println("DiscordUserId: " + DiscordUserId + " AuthenticationToken: " + AuthenticationToken + " RefreshToken: " + RefreshToken + " Date Created: " + DateCreated);
-         }
-      } 
-      catch (SQLException e) 
-      {
-         System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-         System.exit(0);
-      }
+      SelectAllInAuthObjects();
       
       // String query = "CREATE TABLE AuthObjects (AuthObjectsId INTEGER NOT NULL UNIQUE, DiscordUserId TEXT NOT NULL UNIQUE, AuthenticationToken TEXT NOT NULL, RefreshToken TEXT NOT NULL, DateCreated TEXT NOT NULL, PRIMARY KEY (AuthObjectsId AUTOINCREMENT));";
       // try (Statement stmt = c.createStatement()) {
@@ -51,6 +18,41 @@ public class DatabaseConnection {
       //    System.err.println( e.getClass().getName() + ": " + e.getMessage() );
       //    System.exit(0);
       //  }
+   }
+   public static void SelectAllInAuthObjects()
+   {
+       Connection c = null;
+       try {
+           Class.forName("org.sqlite.JDBC");
+           c = DriverManager.getConnection("jdbc:sqlite:test.db");
+       } catch ( Exception e ) {
+           System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+           System.exit(0);
+       }
+       System.out.println("Opened database successfully");
+       String query = "SELECT * FROM AuthObjects;";
+       try (PreparedStatement stmt = c.prepareStatement( query ))
+       {
+           stmt.executeQuery();
+           ResultSet rs = stmt.executeQuery();
+           while (rs.next())
+           {
+               String DiscordUserId = "";
+               String AuthenticationToken = "";
+               String RefreshToken = "";
+               String DateCreated = "";
+               DiscordUserId = rs.getString("DiscordUserId");
+               AuthenticationToken = rs.getString("AuthenticationToken");
+               RefreshToken = rs.getString("RefreshToken");
+               DateCreated = rs.getString("DateCreated");
+               System.out.println("DiscordUserId: " + DiscordUserId + " AuthenticationToken: " + AuthenticationToken + " RefreshToken: " + RefreshToken + " Date Created: " + DateCreated);
+           }
+       }
+       catch (SQLException e)
+       {
+           System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+           System.exit(0);
+       }
    }
    public static Boolean CheckUserStatusInDatabase(String userId)
    {
@@ -157,7 +159,7 @@ public class DatabaseConnection {
       }
       return null;
    }
-   public static Boolean UpdateUserData(String DiscordUserId, String AuthorizationToken, String RefreshToken, String DateCreated) throws SQLException {
+   public static Boolean UpdateUserData(String DiscordUserId, String AuthenticationToken, String RefreshToken, String DateCreated) throws SQLException {
        Connection c = null;
        try {
            Class.forName("org.sqlite.JDBC");
@@ -166,14 +168,30 @@ public class DatabaseConnection {
            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
            System.exit(0);
        }
-       System.out.println("Opened database successfully");
-       String query = "UPDATE AuthObjects SET AuthorizationToken = ?, RefreshToken = ?, DateCreated = ? WHERE DiscordUserId == ?;";
-       PreparedStatement pstmt = c.prepareStatement( query );
-       pstmt.setString( 1, AuthorizationToken);
-       pstmt.setString( 2, RefreshToken);
-       pstmt.setString( 3, DateCreated);
-       pstmt.setString( 4, DiscordUserId);
-       pstmt.executeUpdate();
-       return true;
+       System.out.println("UPDATE " + DiscordUserId);
+       String query = "UPDATE AuthObjects SET AuthenticationToken = ?, RefreshToken = ?, DateCreated = ? WHERE DiscordUserId == ?;";
+       System.out.println("Wowza");
+       PreparedStatement pstmt = null;
+         try {
+            pstmt = c.prepareStatement( query );
+         } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+         System.out.println("Willy Wonka");
+           pstmt.setString( 1, AuthenticationToken);
+           pstmt.setString( 2, RefreshToken);
+           pstmt.setString( 3, DateCreated);
+           pstmt.setString( 4, DiscordUserId);
+       System.out.println("pstmt set");
+       Integer returnVal = null;
+       try {
+           returnVal = pstmt.executeUpdate();
+       } catch (SQLException e) {
+           throw new RuntimeException(e);
+       }
+       System.out.println(returnVal);
+         SelectAllInAuthObjects();
+         return true;
    }
 }

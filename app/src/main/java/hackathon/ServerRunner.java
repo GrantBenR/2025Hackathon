@@ -10,6 +10,7 @@ import com.sun.net.httpserver.HttpServer;
 
 public class ServerRunner
 {
+    public static Integer count = 0;
     public ServerRunner()
     {
         HttpServer server = null;
@@ -30,9 +31,18 @@ public class ServerRunner
         public void handle(HttpExchange t) throws IOException {
             String response = "You can close this window";
             String query = t.getRequestURI().getQuery();
-            String shortQuery = query.substring(5,227);
-            System.out.println(shortQuery);
-            SpotifyAuth.getAccessToken(shortQuery);
+            String shortQuery = query.substring(5,query.length() - 23);
+            if (count < 1)
+            {
+                count++;
+                System.out.println(shortQuery);
+                SpotifyAuth.getAccessToken(shortQuery);
+            }
+            try {
+                t.wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             t.sendResponseHeaders(200, response.length());
             OutputStream os = t.getResponseBody();
             os.write(shortQuery.getBytes());
