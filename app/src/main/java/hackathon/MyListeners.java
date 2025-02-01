@@ -117,20 +117,21 @@ public class MyListeners extends ListenerAdapter {
                         }
                     }
 
-                    channel.sendMessage(trackMessage).queue();
-                    channel.sendMessage(topTracks.get(i).getAlbum().getAlbumName()).queue();
+                    // channel.sendMessage(trackMessage + "\n" + ).queue();
+                    // channel.sendMessage(topTracks.get(i).getAlbum().getAlbumName()).queue();
+                    String insultMessage = "";
                     if (insults.size() == 0)
                     {
-                        channel.sendMessage("Wow, I don't have any insults for this artist . . . yet").queue();
+                        insultMessage = "Wow, I don't have any insults for this artist . . . yet";
                     }
                     else
                     {
                         Random random = new Random();
                         System.out.println(insults.size());
                         int randomInsultIndex = random.nextInt(0, insults.size() - 1);
-                        channel.sendMessage(insults.get(randomInsultIndex)).queue();
+                        insultMessage = insults.get(randomInsultIndex);
                     }
-                    
+                    channel.sendMessage(trackMessage + "\nFeatured on: " + topTracks.get(i).getAlbum().getAlbumName() + "\n" + insultMessage + "\n------------------\n").queue();
                 }
         
             }   
