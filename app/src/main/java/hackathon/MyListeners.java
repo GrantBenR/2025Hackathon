@@ -77,10 +77,11 @@ public class MyListeners extends ListenerAdapter {
                 ArrayList<SpotifyTrack> topTracks = spotifyAuth.getCurrentUserTopTracks(authenticationToken);
                 topTracks.forEach(track ->
                 {
-                    channel.sendMessage(track.toString()).queue();
-                });
+                    //channel.sendMessageEmbeds(track.trackName);
 
-            }
+                });
+        
+            }   
         }
     }
 }
