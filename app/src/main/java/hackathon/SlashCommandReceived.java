@@ -35,6 +35,19 @@ public class SlashCommandReceived extends ListenerAdapter{
         }
     }
 
+    //Guild command - updates instantly 
+    @Override   
+    public void onGuildReady(GuildReadyEvent event){
+        
+        List<CommandData> commandData = new ArrayList<>();
+
+        commandData.add(Commands.slash("RecentArtists", "Imports a list of the most recent artists"));
+        commandData.add(Commands.slash("RecentSongs", "Imports a list of the most recent songs"));
+    
+        event.getGuild().updateCommands().addCommands(commandData).queue();
+    }
+
+
     // Global Command - Updates in about an hour - max 100
     @Override
     public void onReady(ReadyEvent event){
