@@ -48,8 +48,6 @@ public class MyListeners extends ListenerAdapter {
                 channel.sendMessage("User " + event.getAuthor().getName() + " Already Authenticated").queue();
             }
 
-            //Implement here
-
        }
     }
     
