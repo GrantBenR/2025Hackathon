@@ -25,10 +25,10 @@ public class SlashCommandReceived extends ListenerAdapter{
         if(event.getMember().getUser().isBot()) return;
 
         //Command for recent songs (Spotify)
-        if(event.getName().equalsIgnoreCase("Recent_Songs")){
+        if(event.getName().equalsIgnoreCase("recentsongs")){
             event.reply("Your most recent listened to songs were:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
-        else if(event.getName().equalsIgnoreCase("Recent_Artists")){ //Command for recent artists (spotify)
+        else if(event.getName().equalsIgnoreCase("recentartists")){ //Command for recent artists (spotify)
             event.reply("Your most recent listened to songs were:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
         else if(event.getName().equalsIgnoreCase("ping")){ //Command for ping
