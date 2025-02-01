@@ -33,6 +33,7 @@ public class SlashCommandReceived extends ListenerAdapter{
         }
     }
 
+    /* 
     // Guild Command - Updates hopefully instantly - max 100
     @Override
     public void onGuildReady(GuildReadyEvent event) {
@@ -48,5 +49,6 @@ public class SlashCommandReceived extends ListenerAdapter{
         event.getGuild().updateCommands().addCommands(commandData).queue();
 
     }
+        */
 }
 
