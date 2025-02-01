@@ -8,6 +8,9 @@ We used [JDA](https://jda.wiki/setup/intellij/) as our primary API to create the
 
 We used [Spotify Developer API](https://developer.spotify.com/documentation/web-api) to connect to users' spotify accounts and display statistics. 📈
 
+## Testing
+If you want to test the bot, simply add your bot to a discord server and paste your bot's key into a .env file. From there, create a new terminal and output the command ```./gradlew.bat run```. This will turn your bot, and any active changes, on so that you can test it.
+
 ## How can you contribute?
 *You probably can't contribute.* This was made for a hackathon. We didn't get any sleep to make this thing. Probbaly never going to touch it again, so admire it as it is 🤩
 
