@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
@@ -132,11 +133,9 @@ public class SpotifyAuth {
         }
     }
     private static RequestConfig requestConfig = RequestConfig.custom().build();
-    public static String getAccessToken(String code)
+    public static void getAccessToken(String code)
     {
         org.apache.http.client.HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
-        ObjectMapper objectMapper = new ObjectMapper();
-        HttpGet httpGet = new HttpGet(BASE_URL);
         Dotenv dotenv = Dotenv.load();
         String CLIENT_ID = dotenv.get("CLIENT_ID");
         String CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
@@ -154,11 +153,117 @@ public class SpotifyAuth {
             httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
             httpPost.setHeader("Authorization", "Basic " + encodedString);
             HttpEntity response = client.execute(httpPost).getEntity();
-            String authToken = EntityUtils.toString(response);
-            System.out.println("Authentication request response: " + authToken);
-            return authToken;
+            String authTokenObject = EntityUtils.toString(response);
+            System.out.println("Authentication request response: " + authTokenObject);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(authTokenObject);
+            String AUTHENTICATION_TOKEN = jsonNode.get("access_token").asText();
+            System.out.println("Authentication Token: " + AUTHENTICATION_TOKEN);
+            String REFRESH_TOKEN = jsonNode.get("refresh_token").asText();
+            System.out.println("Refresh Token: " + REFRESH_TOKEN);
+            getCurrentUserProfile(AUTHENTICATION_TOKEN);
         }
         catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void getCurrentUserProfile(String token)
+    {
+        HttpClient client = HttpClient.newHttpClient();
+        String endpoint = "https://api.spotify.com/v1/me";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", ("Bearer " + token))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .GET()
+                .build();
+        try
+        {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        }
+        catch (IOException | InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void getCurrentUserTopArtists(String token)
+    {
+        HttpClient client = HttpClient.newHttpClient();
+        String endpoint = "https://api.spotify.com/v1/me/top/artists";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", ("Bearer " + token))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .GET()
+                .build();
+        try
+        {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        }
+        catch (IOException | InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void getCurrentUserTopTracks(String token)
+    {
+        HttpClient client = HttpClient.newHttpClient();
+        String endpoint = "https://api.spotify.com/v1/me/top/tracks";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", ("Bearer " + token))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .GET()
+                .build();
+        try
+        {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        }
+        catch (IOException | InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void getCurrentUserFollowedArtists(String token)
+    {
+        HttpClient client = HttpClient.newHttpClient();
+        String endpoint = "https://api.spotify.com/v1/me/following?type=artist";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", ("Bearer " + token))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .GET()
+                .build();
+        try
+        {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        }
+        catch (IOException | InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void getDoesCurrentUserFollowArtist(String token, String artistId)
+    {
+        HttpClient client = HttpClient.newHttpClient();
+        String endpoint = "https://api.spotify.com/v1/me/following/contains?type=artist&ids=" + artistId;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .header("Authorization", ("Bearer " + token))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .GET()
+                .build();
+        try
+        {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        }
+        catch (IOException | InterruptedException e)
         {
             throw new RuntimeException(e);
         }
