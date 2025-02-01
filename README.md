@@ -22,4 +22,4 @@ View your recently listened to songs or artists and be told how to improve based
 - And more to come!
 
 ## Instructions 📚
-Just add the bot to your server and then turn it on using ./gradlew.bat run
+Just add the bot to your server and then turn it on using ```./gradlew.bat run```
