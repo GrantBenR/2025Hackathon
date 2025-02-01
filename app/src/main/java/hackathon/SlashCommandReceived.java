@@ -24,13 +24,13 @@ public class SlashCommandReceived extends ListenerAdapter{
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event){
         if(event.getMember().getUser().isBot()) return;
         //Command for recent songs (Spotify)
-        if(event.getName().equalsIgnoreCase("recentsongs")){
+        if(event.getName().equalsIgnoreCase("topsongs")){
             ArrayList<String> SongTitles = new ArrayList<>();
-            event.reply("Your most recent listened to songs were: \n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
+            event.reply("Your top listened to songs are: \n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
-        else if(event.getName().equalsIgnoreCase("recentartists")){ //Command for recent artists (spotify)
+        else if(event.getName().equalsIgnoreCase("topartists")){ //Command for recent artists (spotify)
             ArrayList<String> ArtistNames = new ArrayList<>();
-            event.reply("Your most recent listened to songs were:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
+            event.reply("Your top listened to songs are:\n1: \n2: \n3: \n4: \n5: ").setEphemeral(false).queue();
         }
         else if(event.getName().equalsIgnoreCase("ping")){ //Command for ping
             event.reply("Pong!").setEphemeral(false).queue();
