@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
@@ -25,6 +24,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -97,6 +97,9 @@ public class SpotifyAuth {
         }
         return null;
     }
+
+
+    //Part of PKCE Auth flow that is not in use
     public String generateCodeVerifier(int length)
     {
         String text = "";
@@ -107,6 +110,7 @@ public class SpotifyAuth {
         }
         return text;
     }
+    //Also part of PKCE auth flow
     public String generateCodeChallenge(String codeVerifier)
     {
         MessageDigest digest = null;
