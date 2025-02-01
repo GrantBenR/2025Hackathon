@@ -38,6 +38,9 @@ public class MyListeners extends ListenerAdapter {
             if (!isUserInDatabase)
             {
                 channel.sendMessage("New Authentication Request in Progress").queue();
+                SpotifyAuth spotifyAuth = new SpotifyAuth();
+                String url = spotifyAuth.redirectToAuthCodeFlow();
+                channel.sendMessage(url).queue();
             }
             else
             {

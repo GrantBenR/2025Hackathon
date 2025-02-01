@@ -36,18 +36,18 @@ public class SpotifyAuth {
 
     public SpotifyAuth() {
         //Get spotify dev client data from .env
-        Dotenv dotenv = Dotenv.load();
-        String CLIENT_ID = dotenv.get("CLIENT_ID");
-        System.out.println(CLIENT_ID);
-        String CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
-        Integer returnStatus = redirectToAuthCodeFlow(CLIENT_ID);
-        if (returnStatus == 1)
-        {
-            System.out.println("SUCCESS");
-        }
+//        Dotenv dotenv = Dotenv.load();
+//        String CLIENT_ID = dotenv.get("CLIENT_ID");
+//        System.out.println(CLIENT_ID);
+//        String CLIENT_SECRET = dotenv.get("CLIENT_SECRET");
+//        String url = redirectToAuthCodeFlow();
+//        if (url != null)
+//        {
+//            System.out.println("SUCCESS");
+//        }
     }
 
-    public Integer redirectToAuthCodeFlow(String clientId)
+    public String redirectToAuthCodeFlow()
     {
         Dotenv dotenv = Dotenv.load();
         String CLIENT_ID = dotenv.get("CLIENT_ID");
@@ -64,7 +64,7 @@ public class SpotifyAuth {
             String state = generateCodeVerifier(16);
             URI uri = new URIBuilder(httpGet.getURI())
                     .addParameter("response_type", "code")
-                    .addParameter("client_id", clientId)
+                    .addParameter("client_id", CLIENT_ID)
                     .addParameter("scope", "user-read-private user-read-email")
                     .addParameter("redirect_uri", "http://localhost:8888/callback")
 //                    .addParameter("code_challenge_method", "S256")
@@ -78,7 +78,7 @@ public class SpotifyAuth {
                 .POST(HttpRequest.BodyPublishers.ofString(uri.toString()))
                 .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return 1;
+            return uri.toString();
         }
         catch (URISyntaxException e)
         {
