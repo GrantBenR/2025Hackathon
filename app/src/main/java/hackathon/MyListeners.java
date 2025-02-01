@@ -1,16 +1,16 @@
 package hackathon;
 
 //Imports
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Random;
+
 import javax.security.auth.login.LoginException;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-
-import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 
 public class MyListeners extends ListenerAdapter {
     public static Integer counter = 0;
@@ -101,8 +101,12 @@ public class MyListeners extends ListenerAdapter {
                             ArrayList<Artist> artistsWithInsults = ArtistAssembler.CreateInsultsArray();
                             for (int k = 0; k < artistsWithInsults.size(); k++)
                             {
-                                if (artistName == artistsWithInsults.get(k).getName())
+                                String trimmedArtistName = artistName.replace("\"", "").trim();
+                                // System.out.println(trimmedArtistName);
+                                // System.out.println(artistsWithInsults.get(k).getName());
+                                if (trimmedArtistName.equals(artistsWithInsults.get(k).getName()))
                                 {
+                                    System.out.println("match found for " + trimmedArtistName);
                                     insults.addAll(artistsWithInsults.get(k).insultsList);
                                 }
                             }
@@ -121,10 +125,10 @@ public class MyListeners extends ListenerAdapter {
                     }
                     else
                     {
-                        for (int j = 0; j < insults.size(); j++)
-                        {
-                            channel.sendMessage(insults.get(j)).queue();
-                        }
+                        Random random = new Random();
+                        System.out.println(insults.size());
+                        int randomInsultIndex = random.nextInt(0, insults.size() - 1);
+                        channel.sendMessage(insults.get(randomInsultIndex)).queue();
                     }
                     
                 }
