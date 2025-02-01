@@ -12,7 +12,7 @@ public class Artist {
     private String name;
 
     public ArrayList<String> insultsList;
-    
+
     //Artist Constructor
     public Artist(String id, String href, String type, String name, ArrayList<String> insultsList){
         
@@ -24,6 +24,11 @@ public class Artist {
 
         this.insultsList = insultsList;
 
+    }
+
+    @Override
+    public String toString(){
+        return this.name;
     }
     
     //Getter and setters

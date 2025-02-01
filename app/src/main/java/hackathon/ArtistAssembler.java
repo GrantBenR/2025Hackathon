@@ -16,32 +16,34 @@ public class ArtistAssembler {
         Scanner scnr = new Scanner(fInStream);
 
         ArrayList<Artist> artistsList = new ArrayList<>();
+        
+        while (scnr.hasNextLine()) {
+            String name = "";
 
-        while(true){
-            ArrayList<String> insultList = new ArrayList<>();
-            Artist newArtist = new Artist("", "", "", "", insultList);
-
-            //Name
-            if(scnr.hasNextLine()){
-                newArtist.setName(scnr.nextLine());
-            }else{
-                break;
+            // Skip any leading blank lines
+            while (scnr.hasNextLine() && scnr.nextLine().trim().isEmpty()) {
+                // Do nothing, just skip the blank line
             }
-            int Counter = 3; //3 for 3 insults to add to the list after each artist
             
-            while(Counter > 0){
-                newArtist.insultsList.add(scnr.nextLine());
-                Counter--;
+            // Read name
+            if(scnr.hasNextLine()){
+                name = scnr.nextLine();
             }
 
-            //Add the artist to the list
-            artistsList.add(newArtist);
+            // Read the 3 artists into an ArrayList
+            ArrayList<String> insults = new ArrayList<>();
+            for (int i = 0; i < 3 && scnr.hasNextLine(); i++) {
+                insults.add(scnr.nextLine().trim());
+            }
 
-            //Reset values for the next loop around
-            newArtist = null;
-            insultList = null;
+            // Create and print MyObject instance
+            Artist newArtist = new Artist("", "", "", name, insults);
+            System.out.println(newArtist.toString());
+
+            // Skip any blank lines (separators between objects)
+            while (scnr.hasNextLine() && scnr.nextLine().trim().isEmpty()) {
+                // Do nothing (just skip the blank line)
+            }
         }
-
-        System.out.println(artistsList);
     }
 }
